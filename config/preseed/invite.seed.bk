@@ -1,0 +1,85 @@
+#### Contents of the preconfiguration file (for xenial)
+# Localization
+#d-i debian-installer/language string en
+#d-i debian-installer/country string US
+#d-i debian-installer/locale string en_US.UTF-8
+
+
+
+#d-i keyboard-configuration/optionscode string grp:alt_shift_toggle,grp_led:scroll
+#d-i keyboard-configuration/toggle select Alt+Shift
+
+
+# Keyboard selection.
+#d-i console-setup/ask_detect boolean false
+#d-i console-setup/layoutcode string us
+#d-i console-setup/variantcode string
+#d-i keyboard-configuration console-setup/detected note
+#d-i keyboard-configuration/layoutcode string us
+#d-i keyboard-configuration/model select Generic 105-key (Intl) PC
+#d-i keyboard-configuration/xkb-keymap select us
+
+# Users
+d-i passwd/user-fullname string Sunrise User
+d-i passwd/username string sr
+#d-i passwd/user-password-crypted password $6$6iFYEuZHP2bA9c$3NDUdoxY.Gg8QUD8AVXVvASXsnns/C0En213A6IOMpNID6oIvjp2uCNBSEz3XWGooLDHfeSMqU2DNJlLHRygQ/
+d-i passwd/user-password password choocake
+d-i passwd/user-password-again password choocake
+d-i passwd/user-default-groups string adm audio cdrom dip lpadmin sudo plugdev sambashare video
+d-i passwd/root-login boolean true
+d-i passwd/root-password-crypted password $6$jV1ddYWjxamI8g$KBSBraXXBli/hvEtNYJU4KjVyJj0wMiQge2AqADaDYnbWnU5sVag2RnUDyBav/bPdxeIeGenS/pisDwnZ35RB.
+d-i user-setup/allow-password-weak boolean true
+d-i user-setup/encrypt-home boolean true
+
+
+
+ubiquity partman-auto/disk string /dev/sda
+ubiquity partman-auto/method string regular
+ubiquity partman-lvm/device_remove_lvm boolean true
+ubiquity partman-md/device_remove_md boolean true
+ubiquity partman-auto/choose_recipe select atomic
+
+# This makes partman automatically partition without confirmation
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+d-i preseed/early_command string umount /media
+
+
+# Clock
+d-i clock-setup/utc-auto boolean true
+d-i clock-setup/utc boolean true
+d-i time/zone string US/Pacific
+d-i clock-setup/ntp boolean true
+
+d-i unattended-upgrades/enable_auto_updates boolean false
+#d-i pkgsel/update-policy select none
+
+
+#Software
+#d-i tasksel/first multiselect server, openssh-server, postgresql-server, htop
+#d-i pkgsel/include string openssh-server, postgresql-server, htop
+#d-i pkgsel/upgrade select none
+
+
+### Package selection
+#d-i tasksel/first multiselect none
+#d-i pkgsel/include string openssh-server postgresql postgresql-contrib liblog4cxx10v5 libmd0 libssl1.0.0 libsnmp30 libpcap0.8 libconfig9 libreadline6 libxerces-c3.1 xsdcxx libxqilla6v5 cpuset numactl htop mono-complete ptpd mc
+#d-i pkgsel/include string htop
+#d-i base-installer/kernel/override-image string linux-server
+#d-i base-installer/kernel/image string linux-image-4.13.0-32-generic
+#d-i pkgsel/upgrade select none
+#d-i pkgsel/update-policy select unattended-upgrades
+#d-i grub-installer/only_debian boolean true
+#d-i grub-installer/with_other_os boolean true
+
+
+#d-i preseed/late_command string in-target apt install -y /cdrom/pool/extras/htop
+#d-i preseed/late_command string in-target apt install -y linux-image-4.13.0-26-generic
+#d-i preseed/late_command string in-target apt install postgresql postgresql-contrib liblog4cxx10v5 libmd0 libssl1.0.0 libsnmp30 libpcap0.8 libconfig9 libreadline6 libxerces-c3.1 xsdcxx libxqilla6v5 cpuset numactl htop mono-complete ptpd
+#d-i preseed/late_command string \
+#  in-target sudo -u postgres psql -c "create user sr password 'srpass'"; \
+#  in-target sudo -u postgres psql -c 'create database "LogDB"'; \
+#  in-target sudo -u postgres psql -c 'grant all privileges on database "LogDB" to sr'; \
+#  in-target sudo -u postgres psql -c 'alter role sr superuser'
