@@ -96,7 +96,7 @@ find $DISKDIR -type f -print0 | xargs -0 md5sum > $WORKDIR/md5sum.txt
 #            -o distr.iso $DISKDIR
 
 echo "Starting mkisofs..."
-mkisofs -r -V "Custom Ubuntu Install CD" \
+mkisofs -D -r -V "Custom Ubuntu Install CD" \
             -cache-inodes \
             -J -l -b isolinux/isolinux.bin \
             -c isolinux/boot.cat -no-emul-boot \

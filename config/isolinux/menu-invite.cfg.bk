@@ -1,4 +1,0 @@
-label invite
-  menu label ^Invite installation
-  kernel /casper/vmlinuz
-  append  preseed/file=/cdrom/preseed/invite.seed debian-installer/locale=en_US.UTF-8 console-keymaps-at/keymap=ru console-setup/layoutcode=us keyboard-configuration/layoutcode=ru keyboard-configuration/toggle=Alt+Shift initrd=/install/initrd.gz ramdisk_size=16384 root=/dev/ram rw quiet --
