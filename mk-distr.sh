@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # arguments:
+#   <path to iso-file> [ onlycopy ]
+#   OR
 #   skipcopy
-#   onlycopy
 
 
 #apt-get -y install squashfs-tools fakeroot
@@ -26,7 +27,7 @@ if test "$1" != "skipcopy"; then
   mkdir -p  $DISKDIR $MNTDIR
   ISOPATH=$1
   echo "mount iso $ISOPATH to copy disk content"
-  sudo mount -o loop $1 $MNTDIR
+  sudo mount -o loop $ISOPATH $MNTDIR
   #rsync --exclude=/casper/filesystem.squashfs -av $MNTDIR/ $DISKDIR
   echo "copy disk content"
   rsync -av $MNTDIR/ $DISKDIR
@@ -49,7 +50,7 @@ cp -r $CFGDIR/* $DISKDIR/
 #cp $DISKDIR/
 #cd $DISKDIR
 
-exit 0
+#exit 0
 
 ARCHDIR=$DISKDIR/dists/stable/extras/binary-amd64
 mkdir -p $ARCHDIR
@@ -60,16 +61,16 @@ mkdir -p $ARCHDIR
 #apt-ftparchive release -c $DISKDIR/dists/stable > $DISKDIR/dists/stable/Release
 
 
-echo "Make indices"
-rm -rf ./indices
-mkdir -p indices
-cd indices
-DIST=xenial
+#echo "Make indices"
+#rm -rf ./indices
+#mkdir -p indices
+#cd indices
+#DIST=xenial
 ## for SUFFIX in extra.main main main.debian-installer restricted restricted.debian-installer; do
 ##  wget http://archive.ubuntu.com/ubuntu/indices/override.$DIST.$SUFFIX
 ##done
 
-cd ..
+#cd ..
 
 APTCONF=./apt-release.conf
 ###FTPARCHDIR=ftp-archive
@@ -81,7 +82,7 @@ APTCONF=./apt-release.conf
 ###apt-ftparchive -c $APTCONF release $DISKDIR/dists/stable > $DISKDIR/dists/stable/Release
 
 echo "Calculating md5 sums"
-find . -type f -print0 | xargs -0 md5sum > md5sum.txt
+find $DISKDIR -type f -print0 | xargs -0 md5sum > $WORKDIR/md5sum.txt
 
 #xorriso -as mkisofs -r -V "Custom Ubuntu Install CD" \
 #            -cache-inodes \
@@ -100,4 +101,4 @@ mkisofs -r -V "Custom Ubuntu Install CD" \
             -J -l -b isolinux/isolinux.bin \
             -c isolinux/boot.cat -no-emul-boot \
             -boot-load-size 4 -boot-info-table \
-            -o distr.iso $DISKDIR
+            -o $WORKDIR/distr.iso $DISKDIR
