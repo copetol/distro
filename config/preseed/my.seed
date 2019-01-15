@@ -58,3 +58,31 @@ d-i user-setup/allow-password-weak boolean true
 #d-i     grub-installer/timeout  string 2
 # Add the network and tasks oem-config steps by default.
 #oem-config      oem-config/steps        multiselect language, timezone, keyboard, user, network, tasks
+
+# extra packages
+##d-i apt-setup/local0/repository string file:/cdrom extra-pkgs ./
+##d-i debian-installer/allow_unauthenticated string true
+#d-i apt-setup/local0/key string file:/cdrom/public.key
+#d-i pkgsel/include string htop
+#
+#d-i preseed/late_command string in-target apt-install htop
+#d-i preseed/late_command string apt-install htop
+#
+#ubiquity  ubiquity/success_command string \
+#in-target apt install htop\
+#in-target apt-install htop\
+#apt install htop\
+#apt-install htop
+
+
+## does not work #d-i preseed/late_command string sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 processor.max_cstate=1 ' /target/etc/default/grub; in-target bash -c 'update-grub';
+## does not work #d-i preseed/late_command string echo 'd-i' >> /target/var/log/my.log
+
+#ubiquity ubiquity/success_command string echo '# my comment' >> /target/etc/default/grub
+#ubiquity ubiquity/success_command string in-target bash -c 'echo 123 >> /var/log/my.log'
+#ubiquity ubiquity/success_command string in-target sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 processor.max_cstate=1 /' /target/etc/default/grub; in-target bash -c 'update-grub';
+#ubiquity ubiquity/success_command string echo ' ubiquity' >> /target/var/log/my.log
+
+ubiquity ubiquity/success_command string \
+in-target sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 processor.max_cstate=1 /' /target/etc/default/grub; \
+in-target grub-mkconfig -o /boot/grub/grub.cfg ;

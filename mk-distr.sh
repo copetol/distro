@@ -12,6 +12,7 @@ WORKDIR=/home/sr/distr/distr
 CURDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 WDIR=$WORKDIR/ubuntu
 CFGDIR=$CURDIR/config
+EXTRADIR=$CURDIR/extra-pkgs
 
 DISKDIR=$WDIR/disk
 MNTDIR=$WDIR/mnt
@@ -52,8 +53,8 @@ cp -r $CFGDIR/* $DISKDIR/
 
 #exit 0
 
-ARCHDIR=$DISKDIR/dists/stable/extras/binary-amd64
-mkdir -p $ARCHDIR
+##ARCHDIR=$DISKDIR/dists/stable/extras/binary-amd64
+##mkdir -p $ARCHDIR
 ####apt-ftparchive packages $DISKDIR/pool/extras > $ARCHDIR/Packages
 ####gzip -c $ARCHDIR/Packages | tee $ARCHDIR/Packages.gz > /dev/null
 #apt-ftparchive packages ${EXTRAS_POOL} | gzip > ${EXTRAS_DIST}/Packages.gz
@@ -72,7 +73,7 @@ mkdir -p $ARCHDIR
 
 #cd ..
 
-APTCONF=./apt-release.conf
+###APTCONF=./apt-release.conf
 ###FTPARCHDIR=ftp-archive
 ###mkdir -p $FTPARCHDIR
 
@@ -81,8 +82,8 @@ APTCONF=./apt-release.conf
 ###apt-ftparchive -c $APTCONF generate $FTPARCHDIR/apt-ftparchive-extras.conf
 ###apt-ftparchive -c $APTCONF release $DISKDIR/dists/stable > $DISKDIR/dists/stable/Release
 
-echo "Calculating md5 sums"
-find $DISKDIR -type f -print0 | xargs -0 md5sum > $WORKDIR/md5sum.txt
+#echo "Calculating md5 sums"
+#find $DISKDIR -type f -print0 | xargs -0 md5sum > $WORKDIR/md5sum.txt
 
 #xorriso -as mkisofs -r -V "Custom Ubuntu Install CD" \
 #            -cache-inodes \
@@ -95,6 +96,12 @@ find $DISKDIR -type f -print0 | xargs -0 md5sum > $WORKDIR/md5sum.txt
 #            -boot-load-size 4 -boot-info-table \
 #            -o distr.iso $DISKDIR
 
+#echo "Add extra packages"
+#cd $EXTRADIR && dpkg-scanpackages . /dev/null | gzip -9c > Packages.gz && cp -r $EXTRADIR $DISKDIR/dists/stable/
+
+
+#./extra-pkgs.sh $EXTRADIR && cp -r $EXTRADIR $DISKDIR/dists/
+
 echo "Starting mkisofs..."
 mkisofs -D -r -V "Custom Ubuntu Install CD" \
             -cache-inodes \
@@ -102,3 +109,4 @@ mkisofs -D -r -V "Custom Ubuntu Install CD" \
             -c isolinux/boot.cat -no-emul-boot \
             -boot-load-size 4 -boot-info-table \
             -o $WORKDIR/distr.iso $DISKDIR
+
