@@ -8,7 +8,7 @@
 
 #apt-get -y install squashfs-tools fakeroot
 
-WORKDIR=/home/sr/distr/distr
+WORKDIR=/home/sr/work/distro/build
 CURDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 WDIR=$WORKDIR/ubuntu
 CFGDIR=$CURDIR/config
