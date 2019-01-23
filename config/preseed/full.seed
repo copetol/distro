@@ -441,6 +441,8 @@ d-i grub-installer/with_other_os boolean true
 # To install to the first device (assuming it is not a USB stick):
 #d-i grub-installer/bootdev  string default
 
+d-i grub-installer/timeout  string 2
+
 # Alternatively, if you want to install to a location other than the mbr,
 # uncomment and edit these lines:
 #d-i grub-installer/only_debian boolean false
