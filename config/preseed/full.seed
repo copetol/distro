@@ -213,7 +213,7 @@ d-i time/zone string Europe/Moscow
 # - regular: use the usual partition types for your architecture
 # - lvm:     use LVM to partition the disk
 # - crypto:  use LVM within an encrypted partition
-d-i partman-auto/method string lvm
+d-i partman-auto/method string regular
 
 # If one of the disks that are going to be automatically partitioned
 # contains an old LVM configuration, the user will normally receive a
@@ -391,8 +391,8 @@ d-i partman/confirm_nooverwrite boolean true
 tasksel tasksel/first multiselect server
 
 # Individual additional packages to install
-#d-i pkgsel/include string openssh-server build-essential
 #d-i pkgsel/include string openssh-server ansible htop mc
+d-i pkgsel/include string openssh-server
 
 # Whether to upgrade packages after debootstrap.
 # Allowed values: none, safe-upgrade, full-upgrade
