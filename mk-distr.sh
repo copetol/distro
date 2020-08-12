@@ -13,6 +13,7 @@ CURDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 WDIR=$WORKDIR/ubuntu
 CFGDIR=$CURDIR/config
 EXTRADIR=$CURDIR/extra-pkgs
+$WORKDIR/keyring
 
 DISKDIR=$WDIR/disk
 MNTDIR=$WDIR/mnt
@@ -35,6 +36,7 @@ if test "$1" != "skipcopy"; then
   #cp -rT $MNTCD $DISK
   sudo umount $MNTDIR
   sudo chmod -R +w $DISKDIR
+  cp $WORKDIR/keyring/ubuntu-keyring*deb $DISKDIR/pool/main/u/ubuntu-keyring/
 fi
 if test "$2" == "onlycopy"; then
   exit
@@ -102,11 +104,11 @@ cp -r $CFGDIR/* $DISKDIR/
 
 #./extra-pkgs.sh $EXTRADIR && cp -r $EXTRADIR $DISKDIR/dists/
 
-echo "Starting mkisofs..."
-mkisofs -D -r -V "Custom Ubuntu Install CD" \
-            -cache-inodes \
-            -J -l -b isolinux/isolinux.bin \
-            -c isolinux/boot.cat -no-emul-boot \
-            -boot-load-size 4 -boot-info-table \
-            -o $WORKDIR/distr.iso $DISKDIR
+#echo "Starting mkisofs..."
+#mkisofs -D -r -V "Custom Ubuntu Install CD" \
+#            -cache-inodes \
+#            -J -l -b isolinux/isolinux.bin \
+#            -c isolinux/boot.cat -no-emul-boot \
+#            -boot-load-size 4 -boot-info-table \
+#            -o $WORKDIR/distr.iso $DISKDIR
 

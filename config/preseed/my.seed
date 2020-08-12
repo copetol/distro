@@ -1,3 +1,4 @@
+d-i preseed/early_command string umount /media
 # Suggest LVM by default.
 #d-i     partman-auto/init_automatically_partition       string some_device_lvm
 #d-i     partman-auto/init_automatically_partition       seen false
@@ -10,10 +11,54 @@
 #+# ubiquity partman-auto/choose_recipe select atomic
 
 # This makes partman automatically partition without confirmation
-#+# d-i partman-partitioning/confirm_write_new_label boolean true
-#+# d-i partman/choose_partition select finish
-#+# d-i partman/confirm boolean true
-#+# d-i partman/confirm_nooverwrite boolean true
+d-i partman/unmount_active boolean true
+d-i partman/default_filesystem string ext4
+d-i partman-auto/disk string /dev/sda
+d-i partman-auto/method string regular
+d-i partman-auto/choose_recipe select unencrypted-install
+d-i partman-lvm/device_remove_lvm boolean true
+d-i partman-lvm/confirm boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+d-i partman-md/device_remove_md boolean true
+d-i partman-md/confirm boolean true
+#d-i partman/filter_mounted boolean true
+d-i partman/unmount_active boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+
+#                256 1 1024 ext4 \
+#                        $primary{ } $bootable{ } \
+#                        method{ format } format{ } \
+#                        use_filesystem{ } filesystem{ ext4 } \
+#                        mountpoint{ /boot } \
+#                . \
+
+d-i partman-auto/expert_recipe string \
+        unencrypted-install :: \
+                1024 1 8192 linux-swap \
+                        $primary{ } \
+                        method{ swap } format{ } \
+                . \
+                3072 2 81920 ext4 \
+                        $primary{ }  $bootable{ }\
+                        method{ format } format{ } \
+                        use_filesystem{ } filesystem{ ext4 } \
+                        mountpoint{ / } \
+                . \
+                2048 3 10240 ext4 \
+                        $primary{ } \
+                        method{ format } format{ } \
+                        use_filesystem{ } filesystem{ ext4 } \
+                        mountpoint{ /opt/rtm } \
+                . \
+                2048 4 -1 ext4 \
+                        $primary{ } \
+                        method{ format } format{ } \
+                        use_filesystem{ } filesystem{ ext4 } \
+                        mountpoint{ /home/ubuntu/Records } \
+                .
 
 # Locale
 #+# d-i debian-installer/language string en_US:en
@@ -25,25 +70,26 @@
 #c# d-i keyboard-configuration/layout string "American English"
 
 # Network
-#d-i netcfg/get_hostname string unassigned-hostname
-#d-i netcfg/get_domain string unassigned-domain
-#+#d-i netcfg/choose_interface select auto
-#+#d-i mirror/http/proxy string
+d-i netcfg/get_hostname string unassigned-hostname
+#d-i netcfg/hostname string ubuntu
+d-i netcfg/get_domain string unassigned-domain
+d-i netcfg/choose_interface select auto
+d-i mirror/http/proxy string
 
 # Clock
 #d-i clock-setup/utc-auto boolean true
-#+#d-i clock-setup/utc boolean true
-#+#d-i time/zone string Europe/Moscow
+d-i clock-setup/utc boolean true
+d-i time/zone string Europe/Moscow
 #d-i clock-setup/ntp boolean true
 
 # Users
-#+#d-i passwd/user-fullname string Sunrise User
-#+#d-i passwd/username string sr
-#+#d-i passwd/user-password-crypted password wMTgKoUfd01Do
-#+#d-i passwd/root-login boolean true
-#-#d-i passwd/root-password-crypted password d.px/i5shYdu2
-#+#d-i user-setup/allow-password-weak boolean true
-#+#d-i user-setup/encrypt-home boolean false
+d-i passwd/user-fullname string System User
+d-i passwd/username string ubuntu
+d-i passwd/user-password-crypted password wMTgKoUfd01Do
+d-i passwd/root-login boolean true
+d-i passwd/root-password-crypted password QPOKIN0tDsR6Y
+d-i user-setup/allow-password-weak boolean true
+d-i user-setup/encrypt-home boolean false
 
 # Install the Ubuntu Server seed.
 # Only install basic language packs. Let tasksel ask about tasks.
@@ -63,9 +109,14 @@
 #oem-config      oem-config/steps        multiselect language, timezone, keyboard, user, network, tasks
 #+# tasksel tasksel/first multiselect server ansible htop mc
 #+# d-i pkgsel/include string openssh-server ansible htop mc
-#+# d-i pkgsel/update-policy select none
-#+# d-i grub-installer/only_debian boolean true
-#+# d-i finish-install/reboot_in_progress note
+
+
+#d-i base-installer/kernel/image string none
+d-i tasksel/first multiselect OpenSSH server #, standard system utilities, Basic Ubuntu server
+d-i pkgsel/update-policy select none
+d-i pkgsel/include string hello-world linux-image-4.15.0-66-generic linux-modules-4.15.0-66-generic #libgc1c2 libzip4
+d-i grub-installer/only_debian boolean true
+d-i finish-install/reboot_in_progress note
 
 
 # extra packages
@@ -92,7 +143,10 @@
 #ubiquity ubiquity/success_command string in-target sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 processor.max_cstate=1 /' /target/etc/default/grub; in-target bash -c 'update-grub';
 #ubiquity ubiquity/success_command string echo ' ubiquity' >> /target/var/log/my.log
 
-ubiquity ubiquity/success_command string \
-in-target sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 processor.max_cstate=1 /' /target/etc/default/grub; \
-in-target grub-mkconfig -o /boot/grub/grub.cfg ;
-
+#ubiquity ubiquity/success_command string \
+#in-target sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 processor.max_cstate=1 /' /target/etc/default/grub; \
+#in-target grub-mkconfig -o /boot/grub/grub.cfg; \
+#in-target dpkg -i /pool/extras/*.deb;
+#d-i preseed/late_command string dpkg -i /cdrom/pool/extras/*.deb;
+#d-i preseed/late_command string in-target dpkg -i /cdrom/pool/extras/*.deb;
+##d-i preseed/late_command string in-target dpkg -i /pool/extras/*.deb;
