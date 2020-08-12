@@ -1,16 +1,5 @@
 d-i preseed/early_command string umount /media
-# Suggest LVM by default.
-#d-i     partman-auto/init_automatically_partition       string some_device_lvm
-#d-i     partman-auto/init_automatically_partition       seen false
 
-# Newer ubiquity command
-#+# ubiquity partman-auto/disk string /dev/sda
-#+# ubiquity partman-auto/method string regular
-#+# ubiquity partman-lvm/device_remove_lvm boolean true
-#+# ubiquity partman-md/device_remove_md boolean true
-#+# ubiquity partman-auto/choose_recipe select atomic
-
-# This makes partman automatically partition without confirmation
 d-i partman/unmount_active boolean true
 d-i partman/default_filesystem string ext4
 d-i partman-auto/disk string /dev/sda
@@ -91,62 +80,11 @@ d-i passwd/root-password-crypted password QPOKIN0tDsR6Y
 d-i user-setup/allow-password-weak boolean true
 d-i user-setup/encrypt-home boolean false
 
-# Install the Ubuntu Server seed.
-# Only install basic language packs. Let tasksel ask about tasks.
-#d-i     pkgsel/language-pack-patterns   string
-# No language support packages.
-#+#d-i     pkgsel/install-language-support boolean false
-# Only ask the UTC question if there are other operating systems installed.
-#d-i     clock-setup/utc-auto    boolean true
-# Verbose output and no boot splash screen.
-#d-i     debian-installer/quiet  boolean false
-#d-i     debian-installer/splash boolean false
-# Install the debconf oem-config frontend (if in OEM mode).
-#d-i     oem-config-udeb/frontend        string debconf
-# Wait for two seconds in grub
-#d-i     grub-installer/timeout  string 2
-# Add the network and tasks oem-config steps by default.
-#oem-config      oem-config/steps        multiselect language, timezone, keyboard, user, network, tasks
-#+# tasksel tasksel/first multiselect server ansible htop mc
-#+# d-i pkgsel/include string openssh-server ansible htop mc
-
-
 #d-i base-installer/kernel/image string none
 d-i tasksel/first multiselect OpenSSH server #, standard system utilities, Basic Ubuntu server
 d-i pkgsel/update-policy select none
-d-i pkgsel/include string hello-world linux-image-4.15.0-66-generic linux-modules-4.15.0-66-generic #libgc1c2 libzip4
+d-i pkgsel/include string hello-world #linux-image-4.15.0-66-generic linux-modules-4.15.0-66-generic #libgc1c2 libzip4
 d-i grub-installer/only_debian boolean true
 d-i finish-install/reboot_in_progress note
 
 
-# extra packages
-##d-i apt-setup/local0/repository string file:/cdrom extra-pkgs ./
-##d-i debian-installer/allow_unauthenticated string true
-#d-i apt-setup/local0/key string file:/cdrom/public.key
-#d-i pkgsel/include string htop
-#
-#d-i preseed/late_command string in-target apt-install htop
-#d-i preseed/late_command string apt-install htop
-#
-#ubiquity  ubiquity/success_command string \
-#in-target apt install htop\
-#in-target apt-install htop\
-#apt install htop\
-#apt-install htop
-
-
-## does not work #d-i preseed/late_command string sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 processor.max_cstate=1 ' /target/etc/default/grub; in-target bash -c 'update-grub';
-## does not work #d-i preseed/late_command string echo 'd-i' >> /target/var/log/my.log
-
-#ubiquity ubiquity/success_command string echo '# my comment' >> /target/etc/default/grub
-#ubiquity ubiquity/success_command string in-target bash -c 'echo 123 >> /var/log/my.log'
-#ubiquity ubiquity/success_command string in-target sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 processor.max_cstate=1 /' /target/etc/default/grub; in-target bash -c 'update-grub';
-#ubiquity ubiquity/success_command string echo ' ubiquity' >> /target/var/log/my.log
-
-#ubiquity ubiquity/success_command string \
-#in-target sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 processor.max_cstate=1 /' /target/etc/default/grub; \
-#in-target grub-mkconfig -o /boot/grub/grub.cfg; \
-#in-target dpkg -i /pool/extras/*.deb;
-#d-i preseed/late_command string dpkg -i /cdrom/pool/extras/*.deb;
-#d-i preseed/late_command string in-target dpkg -i /cdrom/pool/extras/*.deb;
-##d-i preseed/late_command string in-target dpkg -i /pool/extras/*.deb;
