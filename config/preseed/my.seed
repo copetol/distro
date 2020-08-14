@@ -16,6 +16,9 @@ d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 d-i partman/confirm_nooverwrite boolean true
+#d-i partman/early_command string debconf-set partman-auto/disk /dev/sda \
+#                                 debconf-set grub-installer/bootdev /dev/sda
+
 
 #                256 1 1024 ext4 \
 #                        $primary{ } $bootable{ } \
@@ -24,19 +27,20 @@ d-i partman/confirm_nooverwrite boolean true
 #                        mountpoint{ /boot } \
 #                . \
 
+
 d-i partman-auto/expert_recipe string \
         unencrypted-install :: \
-                1024 1 8192 linux-swap \
+                1024 7 8192 linux-swap \
                         $primary{ } \
                         method{ swap } format{ } \
                 . \
-                3072 2 81920 ext4 \
+                3072 6 81920 ext4 \
                         $primary{ }  $bootable{ }\
                         method{ format } format{ } \
                         use_filesystem{ } filesystem{ ext4 } \
                         mountpoint{ / } \
                 . \
-                2048 3 10240 ext4 \
+                2048 5 10240 ext4 \
                         $primary{ } \
                         method{ format } format{ } \
                         use_filesystem{ } filesystem{ ext4 } \
@@ -59,9 +63,9 @@ d-i partman-auto/expert_recipe string \
 #c# d-i keyboard-configuration/layout string "American English"
 
 # Network
-d-i netcfg/get_hostname string unassigned-hostname
+d-i netcfg/get_hostname string ubuntu
 #d-i netcfg/hostname string ubuntu
-d-i netcfg/get_domain string unassigned-domain
+d-i netcfg/get_domain string local
 d-i netcfg/choose_interface select auto
 d-i mirror/http/proxy string
 
@@ -73,7 +77,7 @@ d-i time/zone string Europe/Moscow
 
 # Users
 d-i passwd/user-fullname string System User
-d-i passwd/username string ubuntu
+d-i passwd/username string user
 d-i passwd/user-password-crypted password wMTgKoUfd01Do
 d-i passwd/root-login boolean true
 d-i passwd/root-password-crypted password QPOKIN0tDsR6Y
@@ -81,10 +85,18 @@ d-i user-setup/allow-password-weak boolean true
 d-i user-setup/encrypt-home boolean false
 
 #d-i base-installer/kernel/image string none
-d-i tasksel/first multiselect OpenSSH server #, standard system utilities, Basic Ubuntu server
+d-i debian-installer/add-kernel-opts string intel_idle.max_cstate=0 processor.max_cstate=1 net.ifnames=0
+d-i tasksel/first multiselect OpenSSH server, standard system utilities, Basic Ubuntu server
 d-i pkgsel/update-policy select none
-d-i pkgsel/include string hello-world #linux-image-4.15.0-66-generic linux-modules-4.15.0-66-generic #libgc1c2 libzip4
+#d-i pkgsel/include string mc ptpd linux-image-4.15.0-66-generic linux-modules-4.15.0-66-generic linux-modules-extra-4.15.0-66-generic libgc1c2 libzip4 tsg-conf tsg-rtm
+d-i pkgsel/include string mc ptpd  libgc1c2 libzip4 tsg-conf tsg-rtm
 d-i grub-installer/only_debian boolean true
-d-i finish-install/reboot_in_progress note
+d-i grub-installer/bootdev string /dev/sda
+#d-i grub-installer/bootdev string default
 
+#d-i finish-install/reboot_in_progress note
 
+d-i preseed/late_command string in-target apt install -y linux-image-4.15.0-66-generic linux-modules-4.15.0-66-generic linux-modules-extra-4.15.0-66-generic; \
+in-target update-initramfs -c -k 4.15.0-66-generic; \
+in-target sed -i 's/GRUB_DEFAULT=[0-9]*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux 4.15.0-66-generic"/' /etc/default/grub; \
+in-target update-grub;
