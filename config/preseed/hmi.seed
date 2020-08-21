@@ -16,21 +16,10 @@ d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 d-i partman/confirm_nooverwrite boolean true
-#d-i partman/early_command string debconf-set partman-auto/disk /dev/sda \
-#                                 debconf-set grub-installer/bootdev /dev/sda
-
-
-#                256 1 1024 ext4 \
-#                        $primary{ } $bootable{ } \
-#                        method{ format } format{ } \
-#                        use_filesystem{ } filesystem{ ext4 } \
-#                        mountpoint{ /boot } \
-#                . \
-
 
 d-i partman-auto/expert_recipe string \
         unencrypted-install :: \
-                1024 1025 8192 linux-swap \
+                1024 1025 16384 linux-swap \
                         $primary{ } \
                         method{ swap } format{ } \
                 . \
@@ -40,19 +29,12 @@ d-i partman-auto/expert_recipe string \
                         use_filesystem{ } filesystem{ ext4 } \
                         mountpoint{ / } \
                 . \
-                2048 2096 10240 ext4 \
+                2048 2096 -1 ext4 \
                         $primary{ } \
                         method{ format } format{ } \
                         use_filesystem{ } filesystem{ ext4 } \
-                        mountpoint{ /opt/rtm } \
-                . \
-                2048 2049 -1 ext4 \
-                        $primary{ } \
-                        method{ format } format{ } \
-                        use_filesystem{ } filesystem{ ext4 } \
-                        mountpoint{ /home/ubuntu/Records } \
+                        mountpoint{ /opt/hmi } \
                 .
-
 # Locale
 d-i debian-installer/language string en_US:en
 d-i debian-installer/language string ru_RU:ru
@@ -90,18 +72,10 @@ d-i user-setup/encrypt-home boolean false
 d-i debian-installer/add-kernel-opts string intel_idle.max_cstate=0 processor.max_cstate=1 net.ifnames=0
 d-i tasksel/first multiselect OpenSSH server, standard system utilities, Basic Ubuntu server
 d-i pkgsel/update-policy select none
-#d-i pkgsel/include string mc ptpd linux-image-4.15.0-66-generic linux-modules-4.15.0-66-generic linux-modules-extra-4.15.0-66-generic libgc1c2 libzip4 tsg-conf tsg-rtm
-d-i pkgsel/include string mc ptpd  libgc1c2 libzip4 tsg-conf tsg-rtm language-pack-ru language-pack-ru-base
+d-i pkgsel/include string mc ptpd language-pack-ru language-pack-ru-base \
+    postgresql postgresql-client postgresql-client-common timescale-* \
+    nats-server tsg-hmi tsg-conf-hmi
 d-i grub-installer/only_debian boolean true
 d-i grub-installer/bootdev string /dev/sda
 #d-i grub-installer/bootdev string default
 
-#d-i finish-install/reboot_in_progress note
-
-d-i preseed/late_command string in-target apt install -y linux-image-4.15.0-66-generic linux-modules-4.15.0-66-generic linux-modules-extra-4.15.0-66-generic; \
-in-target update-initramfs -c -k 4.15.0-66-generic; \
-in-target sed -i 's/GRUB_DEFAULT=[0-9]*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux 4.15.0-66-generic"/' /etc/default/grub; \
-echo 'proc /proc proc rw,nosuid,nodev,relatime 0 0' >> /target/etc/fstab; \
-in-target update-grub;
-#in-target update-locale LANG=ru_RU.utf8;
-#in-target localectl set-locale LANG=ru_RU.UTF-8;

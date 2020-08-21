@@ -1,7 +1,9 @@
+
 WORKDIR=/home/sr/work/distro/build
 DISKDIR=$WORKDIR/ubuntu/disk
 
 echo "copy config files"
+rm -rf $DISKDIR/pool/extras
 cp -r config/* $DISKDIR/
 
 pushd $WORKDIR/ubuntu/disk
@@ -20,7 +22,7 @@ gzip -c dists/stable/extras/binary-amd64/Packages | tee dists/stable/extras/bina
 popd
 
 xorriso -as mkisofs \
-  -o $WORKDIR/distr.iso \
+  -o distr.iso \
   -isohybrid-mbr myisohdpfx.bin \
   -c isolinux/boot.cat \
   -b isolinux/isolinux.bin \
