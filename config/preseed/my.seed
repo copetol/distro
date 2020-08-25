@@ -102,6 +102,9 @@ d-i preseed/late_command string in-target apt install -y linux-image-4.15.0-66-g
 in-target update-initramfs -c -k 4.15.0-66-generic; \
 in-target sed -i 's/GRUB_DEFAULT=[0-9]*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux 4.15.0-66-generic"/' /etc/default/grub; \
 echo 'proc /proc proc rw,nosuid,nodev,relatime 0 0' >> /target/etc/fstab; \
-in-target update-grub;
+in-target update-grub; \
+in-target rm /etc/systemd/system/timers.target.wants/apt-daily-upgrade.timer /etc/systemd/system/timers.target.wants/apt-daily.timer; \
+in-target sed -i 's/APT::Periodic::Update-Package-Lists "1"/APT::Periodic::Update-Package-Lists "0"/' /etc/apt/apt.conf.d/10periodic
+
 #in-target update-locale LANG=ru_RU.utf8;
 #in-target localectl set-locale LANG=ru_RU.UTF-8;

@@ -79,3 +79,5 @@ d-i grub-installer/only_debian boolean true
 d-i grub-installer/bootdev string /dev/sda
 #d-i grub-installer/bootdev string default
 
+d-i preseed/late_command string in-target rm /etc/systemd/system/timers.target.wants/apt-daily-upgrade.timer /etc/systemd/system/timers.target.wants/apt-daily.timer; \
+in-target sed -i 's/APT::Periodic::Update-Package-Lists "1"/APT::Periodic::Update-Package-Lists "0"/' /etc/apt/apt.conf.d/10periodic

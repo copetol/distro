@@ -24,7 +24,7 @@ done
 
 changes=""
 while :; do
-option=`whiptail --cancel-button "Выход" --notags --title "Настройки" --default-item "$main_item"  --menu "\n" 13 66 5 "1" "Сетевые интерфейсы" "2" "PTP сервис" "3" "RTM сервис"  3>&1 1>&2 2>&3`
+option=`whiptail --cancel-button "Выход" --notags --title "Настройки" --default-item "$main_item"  --menu "\n" 13 66 5 "1" "Сетевые интерфейсы" "2" "PTP сервис" "3" "ЧМИ"  3>&1 1>&2 2>&3`
 if [ $? = 0 ];  then main_item=$option; else  break; fi
 case $main_item in
   1)
@@ -89,7 +89,7 @@ case $main_item in
   ptp_cfg=/etc/ptpd2.conf
   ptp_re=""
   while : ; do
-      option=`whiptail --cancel-button "Назад" --notags --title "Настройки PTP" --default-item "$ptp_item" --menu "\n" 13 66 5 "1" "Основной интерфейс" "2" "Резервный интерфейс" "3" "Механизм измерения задержек" "4" "Домен" 3>&1 1>&2 2>&3`
+      option=`whiptail --cancel-button "Назад" --notags --title "Настройки PTP" --default-item "$ptp_item" --menu "\n" 13 66 5 "1" "Основной интерфейс" "2" "Резервный интерфейс" "3" "Механизм измерения задержек" "4" "Домен"  3>&1 1>&2 2>&3`
       if [ $? = 0 ]; then
         ptp_item=$option
         case $ptp_item in
@@ -142,47 +142,33 @@ case $main_item in
   # rtm
   ipdoubled="";
   for(( j=0;j<n; j++ )); do
-    for i in ${ifdict[$j'ip']};do ipdoubled=$ipdoubled' '$i' ('${ifdict[$j'name']}'):'$i; done
+    for i in ${ifdict[$j'ip']};do ipdoubled=$ipdoubled' '$i' ('${ifdict[$j'name']}')'$i; done
   done
   rtm_cfg=/opt/rtm/config.cfg
-  new_rtm_ip="не задан"
-  rtm_re=""
+  hmi_re=""
   while : ; do
-      option=`whiptail --cancel-button "Назад" --notags --title "Настройки РТМ" --default-item "$rtm_item" --menu "\n" 13 66 5 "1" "IP-адрес" "2" "Broadcast-адрес" "3" "Имя"  3>&1 1>&2 2>&3`
+      option=`whiptail --cancel-button "Назад" --notags --title "Настройки ЧМИ" --default-item "$ptp_item" --menu "\n" 13 66 5 "1" "IP-адрес" 3>&1 1>&2 2>&3`
       if [ $? = 0 ]; then
-        rtm_item=$option
-        case $rtm_item in
+        ptp_item=$option
+        case $ptp_item in
           1)
-          option=`whiptail --cancel-button "Отмена" --notags --title "Задать IP-адрес для РТМ" --menu "\n" 13 66 5 $ipdoubled 3>&1 1>&2 2>&3`
+          option=`whiptail --cancel-button "Отмена" --notags --title "Задать IP-адрес для ЧМИ" --menu "\n" 13 66 5 $ipdoubled 3>&1 1>&2 2>&3`
           if [ $? = 0 ]; then
-            new_rtm_ip=$option
-            sed -i "s/ip\s*=\s*.*/ip = \"$new_rtm_ip\"/" $rtm_cfg
-            rtm_re=$rtm_re"\nIP-адрес: "$new_rtm_ip
+            FROM=http://.+:3011
+            TO=http://$option:3011
+            find /opt/hmi/frontend/dist -type f -name "*.js" -exec sed -i "/$FROM/ s/$FROM/$TO/g" {} \;
+            sed -i "/port/ s/\"port\"\s*:\s*.+:/\"port\": \"$option:/" /opt/hmi/cfg.json
+            hmi_re=$hmi_re"\nIP-адрес: "$option
           fi;
-          ;;
-          2)
-          option=`whiptail --cancel-button "Отмена" --backtitle="IP-адрес: $new_rtm_ip" --title "Задать Broadcast-адрес" --inputbox "\n" 13 66 192.168.31.255 3>&1 1>&2 2>&3`
-          if [ $? = 0 ]; then
-            sed -i "s/broadcast_addr\s*=\s*.*/broadcast_addr = \"$option\"/" $rtm_cfg
-            rtm_re=$rtm_re"\nBroadcast-адрес: "$option
-          fi
-          ;;
-          3)
-          option=`whiptail --cancel-button "Отмена" --title "Задать имя для РТМ" --inputbox "\n" 13 66  3>&1 1>&2 2>&3`
-          if [ $? = 0 ]; then
-            sed -i "s/name\s*=\s*.*/name = \"$option\"/" $rtm_cfg
-            rtm_re=$rtm_re"\nИмя: "$option
-          fi
           ;;
         esac
       else
         break
       fi
   done
-  if [ ! -z "$rtm_re" ]; then
-    whiptail --title "Сервис PTM будет перезапущен" --msgbox "\n$rtm_re" 13 66
-    systemctl restart tsep.rtmb
-    systemctl restart tsep.rtmd
+  if [ ! -z "$hmi_re" ]; then
+    whiptail --title "Сервис ЧМИ будет перезапущен" --msgbox "\n$hmi_re" 13 66
+    systemctl restart tsep.hmi
   fi
   ;;
 esac
