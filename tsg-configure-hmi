@@ -144,20 +144,18 @@ case $main_item in
   for(( j=0;j<n; j++ )); do
     for i in ${ifdict[$j'ip']};do ipdoubled=$ipdoubled' '$i' ('${ifdict[$j'name']}')'$i; done
   done
-  rtm_cfg=/opt/rtm/config.cfg
   hmi_re=""
+  hmi_item=0
   while : ; do
-      option=`whiptail --cancel-button "Назад" --notags --title "Настройки ЧМИ" --default-item "$ptp_item" --menu "\n" 13 66 5 "1" "IP-адрес" 3>&1 1>&2 2>&3`
+      option=`whiptail --cancel-button "Назад" --notags --title "Настройки ЧМИ" --default-item "$hmi_item" --menu "\n" 13 66 5 "1" "IP-адрес" 3>&1 1>&2 2>&3`
       if [ $? = 0 ]; then
-        ptp_item=$option
-        case $ptp_item in
+        hmi_item=$option
+        case $hmi_item in
           1)
           option=`whiptail --cancel-button "Отмена" --notags --title "Задать IP-адрес для ЧМИ" --menu "\n" 13 66 5 $ipdoubled 3>&1 1>&2 2>&3`
           if [ $? = 0 ]; then
-            FROM=http://.+:3011
-            TO=http://$option:3011
-            find /opt/hmi/frontend/dist -type f -name "*.js" -exec sed -i "/$FROM/ s/$FROM/$TO/g" {} \;
-            sed -i "/port/ s/\"port\"\s*:\s*.+:/\"port\": \"$option:/" /opt/hmi/cfg.json
+            find /opt/hmi/frontend/dist -type f -name "*.js" -exec sed -E -i "s/http:\/\/[^:]*:3011/http:\/\/$option:3011/g" {} \;
+            sed -E -i "/port/ s/\"port\"\s*:\s*.+?:/\"port\": \"$option:/" /opt/hmi/cfg.json
             hmi_re=$hmi_re"\nIP-адрес: "$option
           fi;
           ;;
@@ -207,4 +205,3 @@ netplan apply
 reboot
   fi
 fi
-
