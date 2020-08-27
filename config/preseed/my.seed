@@ -100,10 +100,23 @@ d-i grub-installer/bootdev string /dev/sda
 
 d-i preseed/late_command string in-target apt install -y linux-image-4.15.0-66-generic linux-modules-4.15.0-66-generic linux-modules-extra-4.15.0-66-generic; \
 in-target update-initramfs -c -k 4.15.0-66-generic; \
-in-target sed -i 's/GRUB_DEFAULT=[0-9]*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux 4.15.0-66-generic"/' /etc/default/grub; \
+in-target depmod; \
+in-target sed -i 's/^GRUB_DEFAULT=[0-9]*/GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux 4.15.0-66-generic"/' /etc/default/grub; \
+in-target sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT/#GRUB_CMDLINE_LINUX_DEFAULT/' /etc/default/grub; \
+in-target sed -i 's/^#GRUB_TERMINAL/GRUB_TERMINAL/' /etc/default/grub; \
 echo 'proc /proc proc rw,nosuid,nodev,relatime 0 0' >> /target/etc/fstab; \
 in-target update-grub; \
-in-target rm /etc/systemd/system/timers.target.wants/apt-daily-upgrade.timer /etc/systemd/system/timers.target.wants/apt-daily.timer; \
+in-target rm /etc/systemd/system/timers.target.wants/apt-daily-upgrade.timer \
+/etc/systemd/system/timers.target.wants/apt-daily.timer \
+/etc/systemd/system/timers.target.wants/motd-news.timer \
+/etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service \
+/etc/systemd/system/open-vm-tools.service.requires/vgauth.service \
+/etc/systemd/system/multi-user.target.wants/unattended-upgrades.service \
+/etc/systemd/system/open-vm-tools.service.requires \
+/etc/systemd/system/multi-user.target.wants/open-vm-tools.service \
+/etc/systemd/system/multi-user.target.wants/lxd-containers.service \
+/etc/systemd/system/sockets.target.wants/lxd.socket; \
+in-target find /etc/systemd -name "snapd*" -exec rm {} \; ; \
 in-target sed -i 's/APT::Periodic::Update-Package-Lists "1"/APT::Periodic::Update-Package-Lists "0"/' /etc/apt/apt.conf.d/10periodic
 
 #in-target update-locale LANG=ru_RU.utf8;

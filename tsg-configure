@@ -148,12 +148,12 @@ case $main_item in
   new_rtm_ip="не задан"
   rtm_re=""
   while : ; do
-      option=`whiptail --cancel-button "Назад" --notags --title "Настройки РТМ" --default-item "$rtm_item" --menu "\n" 13 66 5 "1" "IP-адрес" "2" "Broadcast-адрес" "3" "Имя"  3>&1 1>&2 2>&3`
+      option=`whiptail --cancel-button "Назад" --notags --title "Настройки RTM" --default-item "$rtm_item" --menu "\n" 13 66 5 "1" "IP-адрес" "2" "Broadcast-адрес" "3" "Имя"  3>&1 1>&2 2>&3`
       if [ $? = 0 ]; then
         rtm_item=$option
         case $rtm_item in
           1)
-          option=`whiptail --cancel-button "Отмена" --notags --title "Задать IP-адрес для РТМ" --menu "\n" 13 66 5 $ipdoubled 3>&1 1>&2 2>&3`
+          option=`whiptail --cancel-button "Отмена" --notags --title "Задать IP-адрес для RTM" --menu "\n" 13 66 5 $ipdoubled 3>&1 1>&2 2>&3`
           if [ $? = 0 ]; then
             new_rtm_ip=$option
             sed -i "s/ip\s*=\s*.*/ip = \"$new_rtm_ip\"/" $rtm_cfg
@@ -168,7 +168,7 @@ case $main_item in
           fi
           ;;
           3)
-          option=`whiptail --cancel-button "Отмена" --title "Задать имя для РТМ" --inputbox "\n" 13 66  3>&1 1>&2 2>&3`
+          option=`whiptail --cancel-button "Отмена" --title "Задать имя для RTM" --inputbox "\n" 13 66  3>&1 1>&2 2>&3`
           if [ $? = 0 ]; then
             sed -i "s/name\s*=\s*.*/name = \"$option\"/" $rtm_cfg
             rtm_re=$rtm_re"\nИмя: "$option
