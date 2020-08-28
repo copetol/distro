@@ -106,18 +106,16 @@ in-target sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT/#GRUB_CMDLINE_LINUX_DEFAULT/' /e
 in-target sed -i 's/^#GRUB_TERMINAL/GRUB_TERMINAL/' /etc/default/grub; \
 echo 'proc /proc proc rw,nosuid,nodev,relatime 0 0' >> /target/etc/fstab; \
 in-target update-grub; \
+in-target sed -i 's/APT::Periodic::Update-Package-Lists "1"/APT::Periodic::Update-Package-Lists "0"/' /etc/apt/apt.conf.d/10periodic; \
+in-target apt -y purge update-manager-core update-notifier-common unattended-upgrades snapd plymouth lxd lxd-client landscape-common lxcfs open-vm-tools; \
+in-target apt -y autoremove; \
 in-target rm /etc/systemd/system/timers.target.wants/apt-daily-upgrade.timer \
 /etc/systemd/system/timers.target.wants/apt-daily.timer \
 /etc/systemd/system/timers.target.wants/motd-news.timer \
 /etc/systemd/system/sysinit.target.wants/systemd-timesyncd.service \
 /etc/systemd/system/open-vm-tools.service.requires/vgauth.service \
 /etc/systemd/system/multi-user.target.wants/unattended-upgrades.service \
-/etc/systemd/system/open-vm-tools.service.requires \
 /etc/systemd/system/multi-user.target.wants/open-vm-tools.service \
 /etc/systemd/system/multi-user.target.wants/lxd-containers.service \
 /etc/systemd/system/sockets.target.wants/lxd.socket; \
-in-target find /etc/systemd -name "snapd*" -exec rm {} \; ; \
-in-target sed -i 's/APT::Periodic::Update-Package-Lists "1"/APT::Periodic::Update-Package-Lists "0"/' /etc/apt/apt.conf.d/10periodic
-
-#in-target update-locale LANG=ru_RU.utf8;
-#in-target localectl set-locale LANG=ru_RU.UTF-8;
+in-target find /etc/systemd -name "snapd*" -exec rm {} \; ;
