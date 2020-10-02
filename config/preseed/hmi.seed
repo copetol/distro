@@ -74,7 +74,7 @@ d-i tasksel/first multiselect OpenSSH server, standard system utilities, Basic U
 d-i pkgsel/update-policy select none
 d-i pkgsel/include string mc ptpd language-pack-ru language-pack-ru-base \
     postgresql postgresql-client postgresql-client-common timescale-* \
-    nats-server tsg-hmi tsg-conf-hmi
+    tsg-hmi tsg-conf-hmi
 d-i grub-installer/only_debian boolean true
 d-i grub-installer/bootdev string /dev/sda
 #d-i grub-installer/bootdev string default
