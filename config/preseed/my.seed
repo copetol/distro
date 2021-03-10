@@ -20,22 +20,20 @@ d-i partman/confirm_nooverwrite boolean true
 #                                 debconf-set grub-installer/bootdev /dev/sda
 
 
-#                256 1 1024 ext4 \
-#                        $primary{ } $bootable{ } \
-#                        method{ format } format{ } \
-#                        use_filesystem{ } filesystem{ ext4 } \
-#                        mountpoint{ /boot } \
-#                . \
-
-
 d-i partman-auto/expert_recipe string \
         unencrypted-install :: \
+                256 1 1024 efi \
+                        $primary{ } $bootable{ } \
+                        method{ format } format{ } \
+                        use_filesystem{ } filesystem{ efi } \
+                        mountpoint{ /boot/efi } \
+                . \
                 1024 1025 8192 linux-swap \
                         $primary{ } \
                         method{ swap } format{ } \
                 . \
                 3072 3120 81920 ext4 \
-                        $primary{ }  $bootable{ }\
+                        $primary{ } \
                         method{ format } format{ } \
                         use_filesystem{ } filesystem{ ext4 } \
                         mountpoint{ / } \
@@ -44,13 +42,13 @@ d-i partman-auto/expert_recipe string \
                         $primary{ } \
                         method{ format } format{ } \
                         use_filesystem{ } filesystem{ ext4 } \
-                        mountpoint{ /opt/rtm } \
+                        mountpoint{ /opt/tsg/rtm } \
                 . \
                 2048 2049 -1 ext4 \
                         $primary{ } \
                         method{ format } format{ } \
                         use_filesystem{ } filesystem{ ext4 } \
-                        mountpoint{ /home/ubuntu/Records } \
+                        mountpoint{ /opt/tsg/Records } \
                 .
 
 # Locale
@@ -82,7 +80,7 @@ d-i passwd/user-fullname string System User
 d-i passwd/username string user
 d-i passwd/user-password-crypted password $1$VtKLNmHg$a1hP9jQlC29tE2f3bO6sL1
 d-i passwd/root-login boolean true
-d-i passwd/root-password-crypted password $1$twUXj9Wr$qvqOECNkAghDNKktiSgwh1
+d-i passwd/root-password-crypted password $1$qrtlO5iS$wBbGALyqZjQYW5qtgXGxK0
 d-i user-setup/allow-password-weak boolean true
 d-i user-setup/encrypt-home boolean false
 
@@ -91,7 +89,7 @@ d-i debian-installer/add-kernel-opts string intel_idle.max_cstate=0 processor.ma
 d-i tasksel/first multiselect OpenSSH server, standard system utilities, Basic Ubuntu server
 d-i pkgsel/update-policy select none
 #d-i pkgsel/include string mc ptpd linux-image-4.15.0-66-generic linux-modules-4.15.0-66-generic linux-modules-extra-4.15.0-66-generic libgc1c2 libzip4 tsg-conf tsg-rtm
-d-i pkgsel/include string mc ptpd  libgc1c2 libzip4 tsg-conf tsg-rtm language-pack-ru language-pack-ru-base
+d-i pkgsel/include string mc ptpd  libgc1c2 libzip4 tsg-conf tsg-rtm language-pack-ru language-pack-ru-base health
 d-i grub-installer/only_debian boolean true
 d-i grub-installer/bootdev string /dev/sda
 #d-i grub-installer/bootdev string default

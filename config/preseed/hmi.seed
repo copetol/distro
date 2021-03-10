@@ -64,7 +64,7 @@ d-i passwd/user-fullname string System User
 d-i passwd/username string user
 d-i passwd/user-password-crypted password $1$VtKLNmHg$a1hP9jQlC29tE2f3bO6sL1
 d-i passwd/root-login boolean true
-d-i passwd/root-password-crypted password $1$twUXj9Wr$qvqOECNkAghDNKktiSgwh1
+d-i passwd/root-password-crypted password $1$qrtlO5iS$wBbGALyqZjQYW5qtgXGxK0
 d-i user-setup/allow-password-weak boolean true
 d-i user-setup/encrypt-home boolean false
 
